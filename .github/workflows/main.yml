@@ -13,8 +13,12 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
+      deployments: write
     timeout-minutes: 10
     concurrency: ${{ github.workflow }}-deploy-staging
+    environment:
+      name: staging
+      url: https://staging.blazesportsintel.com
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -30,7 +34,18 @@ jobs:
       - name: Run tests
         run: pnpm test
 
-      - name: Deploy Workers (staging)
+      - name: Deploy Workers (staging) via Wrangler Action
+        uses: Blaze-sports-Intel/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --env staging
+          workingDirectory: '.'
+          packageManager: pnpm
+          preCommands: |
+            echo "Deploying to Cloudflare Workers staging environment"
+
+      - name: Deploy MCP Servers (staging)
         run: pnpm turbo deploy -- -e staging
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
