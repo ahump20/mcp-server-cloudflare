@@ -1,0 +1,158 @@
+# Wrangler Configuration for Blaze Sports Intel
+# https://developers.cloudflare.com/workers/wrangler/configuration/
+
+name = "blazesportsintel-mcp"
+main = "src/index.ts"
+compatibility_date = "2025-01-28"
+compatibility_flags = ["nodejs_compat"]
+
+# Workers settings
+workers_dev = false
+preview_urls = false
+
+# Observability
+[observability]
+enabled = true
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 0.1
+
+# Development settings
+[dev]
+port = 8976
+local_protocol = "http"
+
+# Environment variables (placeholders - set via secrets)
+[vars]
+ENVIRONMENT = "development"
+SITE_NAME = "Blaze Sports Intel"
+SITE_URL = "https://blazesportsintel.com"
+
+# KV Namespaces
+[[kv_namespaces]]
+binding = "OAUTH_KV"
+id = "BLAZESPORTSINTEL_DEV_KV"
+
+# Durable Objects
+[durable_objects]
+bindings = [
+  { name = "MCP_OBJECT", class_name = "BlazeSportsIntelMCP" }
+]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["BlazeSportsIntelMCP"]
+
+# AI Binding
+[ai]
+binding = "AI"
+
+# Analytics Engine
+[[analytics_engine_datasets]]
+binding = "MCP_METRICS"
+dataset = "blazesportsintel-metrics-dev"
+
+# ============================================
+# STAGING ENVIRONMENT
+# ============================================
+[env.staging]
+name = "blazesportsintel-mcp-staging"
+workers_dev = false
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+SITE_NAME = "Blaze Sports Intel (Staging)"
+SITE_URL = "https://staging.blazesportsintel.com"
+
+[[env.staging.routes]]
+pattern = "staging.blazesportsintel.com"
+custom_domain = true
+
+[[env.staging.kv_namespaces]]
+binding = "OAUTH_KV"
+id = "BLAZESPORTSINTEL_STAGING_KV"
+
+[env.staging.durable_objects]
+bindings = [
+  { name = "MCP_OBJECT", class_name = "BlazeSportsIntelMCP" }
+]
+
+[env.staging.ai]
+binding = "AI"
+
+[[env.staging.analytics_engine_datasets]]
+binding = "MCP_METRICS"
+dataset = "blazesportsintel-metrics-staging"
+
+# ============================================
+# PRODUCTION ENVIRONMENT
+# ============================================
+[env.production]
+name = "blazesportsintel-mcp-production"
+workers_dev = false
+
+[env.production.vars]
+ENVIRONMENT = "production"
+SITE_NAME = "Blaze Sports Intel"
+SITE_URL = "https://blazesportsintel.com"
+
+[[env.production.routes]]
+pattern = "blazesportsintel.com"
+custom_domain = true
+
+[[env.production.routes]]
+pattern = "www.blazesportsintel.com"
+custom_domain = true
+
+[[env.production.routes]]
+pattern = "api.blazesportsintel.com"
+custom_domain = true
+
+[[env.production.routes]]
+pattern = "mcp.blazesportsintel.com"
+custom_domain = true
+
+[[env.production.kv_namespaces]]
+binding = "OAUTH_KV"
+id = "BLAZESPORTSINTEL_PRODUCTION_KV"
+
+[env.production.durable_objects]
+bindings = [
+  { name = "MCP_OBJECT", class_name = "BlazeSportsIntelMCP" }
+]
+
+[env.production.ai]
+binding = "AI"
+
+[[env.production.analytics_engine_datasets]]
+binding = "MCP_METRICS"
+dataset = "blazesportsintel-metrics-production"
+
+# ============================================
+# PREVIEW ENVIRONMENT (for Pull Requests)
+# ============================================
+[env.preview]
+name = "blazesportsintel-mcp-preview"
+workers_dev = true
+
+[env.preview.vars]
+ENVIRONMENT = "preview"
+SITE_NAME = "Blaze Sports Intel (Preview)"
+SITE_URL = "https://preview.blazesportsintel.com"
+
+[[env.preview.kv_namespaces]]
+binding = "OAUTH_KV"
+id = "BLAZESPORTSINTEL_PREVIEW_KV"
+
+[env.preview.durable_objects]
+bindings = [
+  { name = "MCP_OBJECT", class_name = "BlazeSportsIntelMCP" }
+]
+
+[env.preview.ai]
+binding = "AI"
+
+[[env.preview.analytics_engine_datasets]]
+binding = "MCP_METRICS"
+dataset = "blazesportsintel-metrics-preview"

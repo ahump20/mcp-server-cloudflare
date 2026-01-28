@@ -50,6 +50,10 @@ jobs:
     concurrency: ${{ github.workflow }}-deploy-production
     permissions:
       contents: read
+      deployments: write
+    environment:
+      name: production
+      url: https://blazesportsintel.com
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -59,6 +63,18 @@ jobs:
           name: published-packages
           path: ${{ runner.temp }}
       - uses: ./.github/actions/setup
+
+      - name: Deploy Workers (production) via Wrangler Action
+        uses: Blaze-sports-Intel/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --env production
+          workingDirectory: '.'
+          packageManager: pnpm
+          preCommands: |
+            echo "Deploying to Cloudflare Workers production environment"
+
       - name: Deploy Published Workers (production)
         run: pnpm runx deploy-published-workers --env production
         env:
